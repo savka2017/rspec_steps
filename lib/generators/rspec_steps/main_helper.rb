@@ -1,22 +1,36 @@
 module RspecSteps
   module Generators
     module MainHelper
-
-      def extract_method_from_line(original_line)
-        line = original_line.gsub(/\S*#.*$/, '').strip
-        result = nil
-        if line.start_with? 'def '
-          result = line.gsub('def ', '')
-        else
-          RspecSteps.prefixes.each { |prefix| result = line.gsub(prefix, '') if line.start_with? prefix }
-        end
+      def extract_method_from_line(line)
+        result = strip_prefixes(strip_comment(line).strip)
         if result
-          line = result
-          params = line.scan(/\((.*)\)/).flatten[0].to_s
-          method = line.gsub(params, '').delete_suffix('()')
-          result = method + '(' + ('param1'.."param#{params.count(',') + 1}").to_a.join(',') + ')' unless line == method
+          params = extract_params result
+          method = extract_method result, params
+          result = build_method(method, params.count(',') + 1) unless result == method
         end
         result
+      end
+
+      def strip_comment(line)
+        line.gsub(/\S*#.*$/, '').rstrip
+      end
+
+      def strip_prefixes(line)
+        prefixes = ['def '] + RspecSteps.prefixes
+        prefixes.each { |prefix| return line.gsub(prefix, '') if line.start_with? prefix }
+        nil
+      end
+
+      def build_method(method, params_count)
+        method + '(' + ('param1'.."param#{params_count}").to_a.join(',') + ')'
+      end
+
+      def extract_params(line)
+        line.scan(/\((.*)\)/).flatten[0].to_s
+      end
+
+      def extract_method(line, params)
+        line.gsub(params, '').delete_suffix('()')
       end
 
       def extract_methods_from_file(file)
