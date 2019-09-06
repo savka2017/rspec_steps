@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rspec_steps/version"
+require 'active_support/dependencies'
 
 module RspecSteps
   class Error < StandardError; end
