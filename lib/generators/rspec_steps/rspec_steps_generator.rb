@@ -9,56 +9,65 @@ module RspecSteps
       namespace "rspec_steps"
       source_root File.expand_path("../templates", __FILE__)
 
-      desc "Generates/updates helper file with new methods definitions\
-            that has been found in spec file"
+      desc "Generates/updates helper file with definitions of method(s)\
+            that(s) has been found in spec file"
 
-      attr_accessor :spec_methods, :helpers_methods, :new_methods, :helper, :helper_path
+      attr_accessor :defined_methods, :new_methods
 
       def create_methods
-        extract_methods
-        if new_methods.empty?
+        if collect_methods.empty?
           puts 'All methods from this spec already defined'
         else
           build_helper
+          puts "Create definition(s) for #{new_methods_count} method(s)"
         end
-        update_spec if comment_methods?
+        if comment_methods?
+          comments_count = comment_spec
+          puts "Add #{comments_count} comments to #{file_path}" unless comments_count == 0
+        end
       end
 
       private
 
-      def extract_methods
-        @helpers_methods = extract_methods_from_dir RspecSteps.helpers_dir
-        @spec_methods = extract_methods_from_file file_path
-        @new_methods = spec_methods.map(&:first) - helpers_methods.map(&:first)
+      def collect_methods
+        @defined_methods = helper_dirs.inject([]) { |m, dir| m << methods_from_dir(dir) }.flatten(1).compact
+        spec_methods = methods_from_file file_path
+        @new_methods = spec_methods.map(&:first) - defined_methods.map(&:first)
       end
 
       def build_helper
-        relative_path = File.dirname(file_path).split('/')[2..-1].join('/') + '/'
+        relative_path = File.dirname(file_path).split('/')[2..-1].join('/')
         helper_name = "#{file_name.gsub('_spec.rb', '_helper')}"
-        @helper_path = File.join(RspecSteps.helpers_dir, relative_path) + helper_name + '.rb'
-        @helper = helper_name.titleize.gsub(' ', '')
+        helper_path = File.join(rspec_steps_dir, relative_path, helper_name) + '.rb'
 
         unless File.exist?(helper_path)
           template 'template_helper.rb', helper_path
-          gsub_file helper_path, 'TemplateHelper', helper
+          gsub_file helper_path, 'TemplateHelper', helper_name.camelize
         end
 
-        metods_anchor = 'extend RspecSteps::Aliaseble'
-        methods = ''
-        new_methods.each do |method|
-          methods << "\n"
-          methods << "\n  def #{method}"
-          methods << "\n  end"
-        end
-        insert_into_file(helper_path, methods, after: metods_anchor)
+        methods_anchor = 'extend RspecSteps::Aliaseble'
+        methods = build_method_definitions(new_methods)
+        insert_into_file(helper_path, methods, after: methods_anchor)
       end
 
-      def update_spec
-        comment_file(file_path)
+      def comment_spec
+        comment_file(file_path, defined_methods)
+      end
+
+      def new_methods_count
+        new_methods.count
       end
 
       def comment_methods?
         RspecSteps.comment_specs_with_method_location
+      end
+
+      def helper_dirs
+        RspecSteps.helper_dirs
+      end
+
+      def rspec_steps_dir
+        RspecSteps.rspec_steps_dir
       end
     end
   end

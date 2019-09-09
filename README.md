@@ -22,7 +22,74 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+**Write some spec:**
+
+given_i_am_logged_as_admin  
+when_i_click_button('Create order')  
+and_i_fill_all_requisites  
+then_i_should_see_confirmation('Order created succesfully')  
+and_new_record_should_be_added_to_db
+
+**Imp
+
+**Run:**
+
+    $ rails g rspec_steps spec/feature/path_to_this_spec/this_spec.rb
+   
+In spec/rspec_steps/path_to_this_spec/this_helper.rb you receive method-definitions for all methods from this_spec.rb.  
+As following:
+
+`def i_am_logged_as_admin`  
+`end`
+
+`def i_click_button(arg1)`  
+`end`
+
+`def i_fill_all_requisites`  
+`end`
+
+`def i_should_see_confirmation(arg1)`  
+`end`
+
+`def new_record_should_be_added_to_db`  
+`end`
+
+**Important: All methods in helper should be without prefixes.**
+
+Definitions are build only for methods that start with:  
+ *given_, when_, then_, and_*  
+ All other methods will be ignored by gem.
+ 
+ If some method already defined in this or another helper, 
+ its definition do not creates. 
+ Instead, to the end of line will be add comment with file location.  
+  E.g.:  
+  `when_i_log_out # spec/support/another_helper.rb`
+
+You can use each method in spec several times whith different prefixes. 
+
+Finally, you can write some turnip-acceptance test and use defined methods to build turnip-steps:
+
+`step 'I am logged as admin' do`  
+`i_am_logged_as_admin`  
+`end`
+
+`step 'I create new order' do`  
+`i_click_button('Create order')`  
+`and_i_fill_all_requisites`  
+`end`
+
+`step 'New order are successfully created' do`  
+`i_should_see_confirmation('Order created succesfully')`  
+`and_new_record_should_be_added_to_db`  
+`end`
+
+In step definition you can use methods with or without prefixes.  
+Group them accordingly to logic of step description.  
+Main creteria: readability.
+
+### What can you change?
+ 
 
 ## Development
 

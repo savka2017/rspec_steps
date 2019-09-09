@@ -1,14 +1,16 @@
 module RspecSteps
   module Generators
     module MainHelper
-      def extract_method_from_line(line)
-        result = strip_prefixes(strip_comment(line).strip)
-        if result
-          params = extract_params result
-          method = extract_method result, params
-          result = build_method(method, params.count(',') + 1) unless result == method
-        end
-        result
+      # strip all spaces, comments, prefixes, empty brackets, and replace real args with generic arg1,arg2..,argN
+      def build_generic_method(line)
+        method = method_from_line line
+        method = build_method(method_name(method), args_count(method)) if method && method.index('(')
+        method
+      end
+
+      # strip prefixes, comments, and empty brackets
+      def method_from_line(line)
+        strip_prefixes(strip_comment(line).strip)&.gsub('()', '')
       end
 
       def strip_comment(line)
@@ -17,66 +19,57 @@ module RspecSteps
 
       def strip_prefixes(line)
         prefixes = ['def '] + RspecSteps.prefixes
-        prefixes.each { |prefix| return line.gsub(prefix, '') if line.start_with? prefix }
+        prefixes.each { |prefix| return line.delete_prefix(prefix) if line.start_with? prefix }
         nil
       end
 
-      def build_method(method, params_count)
-        method + '(' + ('param1'.."param#{params_count}").to_a.join(',') + ')'
+      # concat method name with generic args
+      def build_method(method_name, args_count)
+        method_name + '(' + ('arg1'.."arg#{args_count}").to_a.join(',') + ')'
       end
 
-      def extract_params(line)
-        line.scan(/\((.*)\)/).flatten[0].to_s
+      def args_count(line)
+        line.scan(/\((.*)\)/).flatten[0].gsub(/['"]([^['"]]*)['"]/, 'arg').split(',').count
       end
 
-      def extract_method(line, params)
-        line.gsub(params, '').delete_suffix('()')
+      def method_name(line)
+        line[0..(line.index('(') - 1)]
       end
 
-      def extract_methods_from_file(file)
-        file_lines = File.read file
+      def methods_from_file(file)
         lines = []
-        file_lines.each_line { |line| lines << extract_method_from_line(line) }
-        lines.compact!.uniq!
-        lines.map { |line| [line, file] }
+        File.read(file).each_line { |line| lines << build_generic_method(line) }
+        lines.compact.uniq.map { |line| [line, file] }
       end
 
-      def extract_methods_from_dir(dir)
+      def methods_from_dir(dir)
         lines = []
         searth_dir = File.join(dir, '**', '*_helper.rb')
-        Dir[searth_dir].each do |file|
-          extract_methods_from_file(file).each { |method| lines << method }
-        end
-        lines.uniq(&:first)
+        Dir[searth_dir].each { |file| lines << methods_from_file(file) }
+        lines.flatten(1).uniq(&:first)
       end
 
-      def comment_file(commented_file)
-        temp_file = Tempfile.new 'spec'
-        begin
-          File.open(commented_file, 'r') do |file|
-            until file.eof?
-              new_line = file.readline
-              method = extract_method_from_line(new_line)
-              if method
-                helpers_methods.each do |helper_method|
-                  new_line = comment_line(new_line, helper_method.second) if helper_method.first == method
-                end
-              end
-              temp_file.puts new_line
-            end
+      def comment_file(file, methods)
+        comments_count = 0
+        File.read(file).each_line do |line|
+          generic_method = build_generic_method line
+          if generic_method
+            method = methods.detect { |e| e.first == generic_method }
+            comment_line(file, line, method&.second)
+            comments_count += 1 if method
           end
-          temp_file.close
-          FileUtils.mv(temp_file.path, file_path)
-        ensure
-          temp_file.close
-          temp_file.unlink
         end
+        comments_count
       end
 
-      def comment_line(line, file)
-        method = line.gsub(/\S*#.*$/, '').strip
-        line_with_comments = line.strip
-        line.gsub(line_with_comments, method + " # #{file.gsub(RspecSteps.helpers_dir, '')}")
+      # comment(if file) or uncomment(if file == nil) line
+      def comment_line(commented_file, line, file = nil)
+        comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
+        gsub_file commented_file, line, strip_comment(line) + comment, {verbose: false }
+      end
+
+      def build_method_definitions(methods)
+        methods.inject('') { |result, method| result << "\n\n  def #{method}\n  end" }
       end
     end
   end
