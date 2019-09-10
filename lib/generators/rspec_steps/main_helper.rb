@@ -1,6 +1,9 @@
+require 'string_helper'
+
 module RspecSteps
   module Generators
     module MainHelper
+      include StringHelper
       # strip all spaces, comments, prefixes, empty brackets, and replace real args with generic arg1,arg2..,argN
       def build_generic_method(line)
         method = method_from_line line
@@ -10,11 +13,7 @@ module RspecSteps
 
       # strip prefixes, comments, and empty brackets
       def method_from_line(line)
-        strip_prefixes(strip_comment(line).strip)&.gsub('()', '')
-      end
-
-      def strip_comment(line)
-        line.gsub(/\S*#.*$/, '').rstrip
+        strip_prefixes(decomment(line).strip)&.gsub('()', '')
       end
 
       def strip_prefixes(line)
@@ -65,7 +64,7 @@ module RspecSteps
       # comment(if file) or uncomment(if file == nil) line
       def comment_line(commented_file, line, file = nil)
         comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
-        gsub_file commented_file, line, strip_comment(line) + comment, {verbose: false }
+        gsub_file commented_file, line, decomment(line) + comment, {verbose: false }
       end
 
       def build_method_definitions(methods)
