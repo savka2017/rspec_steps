@@ -7,4 +7,8 @@ module StringHelper
     prefixes.each { |prefix| return line.delete_prefix(prefix) if line.start_with? prefix }
     nil
   end
+
+  def has_args?(method)
+    !!(method&.index(' ') || method&.index('('))
+  end
 end
