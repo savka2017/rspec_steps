@@ -11,13 +11,24 @@ module RspecSteps
         method
       end
 
+      def build_generic_step(line)
+        step_from_line(line.strip)
+      end
+
       # strip prefixes, comments, and empty brackets
       def method_from_line(line)
         strip_prefixes(decomment(line).strip)&.gsub('()', '')
       end
 
+      def step_from_line(line)
+        new_line = strip_prefixes(line)&.strip&.delete_suffix(' do')
+        new_line&.gsub!(/\A'|'\Z/, "") if line.strip.start_with?('step')
+        new_line
+      end
+
       def strip_prefixes(line)
-        prefixes = ['def '] + RspecSteps.prefixes
+        pref = @mode == 'method' ? 'def ' : 'step '
+        prefixes = [pref] + RspecSteps.send("#{@mode}_prefixes")
         deprefix(line, prefixes)
       end
 
@@ -30,16 +41,16 @@ module RspecSteps
         args.split(',').count
       end
 
-      def methods_from_file(file)
+      def defs_from_file(file)
         lines = []
-        File.read(file).each_line { |line| lines << build_generic_method(line) }
+        File.read(file).each_line { |line| lines << send("build_generic_#{@mode}", line) }
         lines.compact.uniq.map { |line| [line, file] }
       end
 
-      def methods_from_dir(dir)
+      def defs_from_dir(dir)
         lines = []
-        searth_dir = File.join(dir, '**', '*_helper.rb')
-        Dir[searth_dir].each { |file| lines << methods_from_file(file) }
+        searth_dir = File.join(dir, '**', '*.rb')
+        Dir[searth_dir].each { |file| lines << defs_from_file(file) }
         lines.flatten(1).uniq(&:first)
       end
 
@@ -56,14 +67,17 @@ module RspecSteps
         comments_count
       end
 
-      # comment(if file) or uncomment(if file == nil) line
       def comment_line(commented_file, line, file = nil)
         comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
         gsub_file commented_file, line, decomment(line) + comment, {verbose: false }
       end
 
-      def build_method_definitions(methods)
-        methods.inject('') { |result, method| result << "\n\n  def #{method}\n  end" }
+      def build_definitions(defs)
+        defs.inject('') { |result, d| result << defs_pattern(d) }
+      end
+
+      def defs_pattern(defs)
+        @mode == 'step' ? "step '#{defs}' do\nend\n\n" : "\n\n  def #{defs}\n  end"
       end
     end
   end

@@ -20,7 +20,7 @@ RSpec.describe '.build_generic_method' do
 
   it 'recognizes lines starting with prefixes' do
     line = 'i_am_logged_as_admin'
-    RspecSteps.prefixes.each do |prefix|
+    RspecSteps.method_prefixes.each do |prefix|
       expect(build_generic_method("#{prefix}#{line}")).to eq 'i_am_logged_as_admin'
     end
   end
