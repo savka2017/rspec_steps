@@ -8,8 +8,8 @@ module RspecSteps
       def build_generic_method(line)
         method = method_from_line line
         if has_args?(method)
-          method = depoet(method)
-          method = build_method(method_name(method), args_count(method))
+          name, args = to_name_and_args depoet(method)
+          method = build_method(name, args_count(args))
         end
         method
       end
@@ -30,11 +30,7 @@ module RspecSteps
       end
 
       def args_count(line)
-        line.scan(/\((.*)\)/).flatten[0].gsub(/['"]([^['"]]*)['"]/, 'arg').split(',').count
-      end
-
-      def method_name(line)
-        line[0..(line.index('(') - 1)]
+        line.gsub(/['"]([^['"]]*)['"]/, 'arg').split(',').count
       end
 
       def methods_from_file(file)

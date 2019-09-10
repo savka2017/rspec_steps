@@ -20,4 +20,14 @@ module StringHelper
     end
     method
   end
+
+  def to_name_and_args(method)
+    args = method.scan(/\((.*)\)/).flatten[0]
+    name = method.gsub(args, '').gsub('()', '')
+    return name, args
+  end
+
+  def dequote_args(args)
+    args
+  end
 end
