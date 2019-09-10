@@ -23,11 +23,11 @@ module StringHelper
 
   def to_name_and_args(method)
     args = method.scan(/\((.*)\)/).flatten[0]
-    name = method.gsub(args, '').gsub('()', '')
-    return name, args
+    name = method.gsub('(' + args + ')', '')
+    return [name, args]
   end
 
-  def dequote_args(args)
-    args
+  def dequote(args)
+    args.gsub(/['"]([^['"]]*)['"]/, 'arg')
   end
 end

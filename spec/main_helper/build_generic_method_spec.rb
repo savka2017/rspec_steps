@@ -54,4 +54,9 @@ RSpec.describe '.build_generic_method' do
     line = 'when_i_confirm_dialog()'
     expect(build_generic_method(line)).to eq 'i_confirm_dialog'
   end
+
+  it 'recognizes poetic-style arguments' do
+    line = 'when_table_contain table, "some value, or something else"'
+    expect(build_generic_method(line)).to eq 'table_contain(arg1,arg2)'
+  end
 end

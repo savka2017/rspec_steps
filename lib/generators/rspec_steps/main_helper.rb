@@ -7,10 +7,7 @@ module RspecSteps
       # strip all spaces, comments, prefixes, empty brackets, and replace real args with generic arg1,arg2..,argN
       def build_generic_method(line)
         method = method_from_line line
-        if has_args?(method)
-          name, args = to_name_and_args depoet(method)
-          method = build_method(name, args_count(args))
-        end
+        method = build_method to_name_and_args(depoet(method)) if has_args?(method)
         method
       end
 
@@ -25,12 +22,12 @@ module RspecSteps
       end
 
       # concat method name with generic args
-      def build_method(method_name, args_count)
-        method_name + '(' + ('arg1'.."arg#{args_count}").to_a.join(',') + ')'
+      def build_method(method)
+        method[0] + '(' + ('arg1'.."arg#{args_count dequote(method[1])}").to_a.join(',') + ')'
       end
 
-      def args_count(line)
-        line.gsub(/['"]([^['"]]*)['"]/, 'arg').split(',').count
+      def args_count(args)
+        args.split(',').count
       end
 
       def methods_from_file(file)
