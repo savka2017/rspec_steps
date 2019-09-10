@@ -18,8 +18,7 @@ module RspecSteps
 
       def strip_prefixes(line)
         prefixes = ['def '] + RspecSteps.prefixes
-        prefixes.each { |prefix| return line.delete_prefix(prefix) if line.start_with? prefix }
-        nil
+        deprefix(line, prefixes)
       end
 
       # concat method name with generic args
