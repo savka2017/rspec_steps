@@ -7,7 +7,10 @@ module RspecSteps
       # strip all spaces, comments, prefixes, empty brackets, and replace real args with generic arg1,arg2..,argN
       def build_generic_method(line)
         method = method_from_line line
-        method = build_method(method_name(method), args_count(method)) if has_args?(method)
+        if has_args?(method)
+          method = depoet(method)
+          method = build_method(method_name(method), args_count(method))
+        end
         method
       end
 

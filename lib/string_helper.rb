@@ -11,4 +11,13 @@ module StringHelper
   def has_args?(method)
     !!(method&.index(' ') || method&.index('('))
   end
+
+  def depoet(method)
+    unless (method.index('(') || method.length) <= (method.index(' ') || method.length)
+      method_name = method[0..method.index(' ')].strip
+      args = method.gsub(method_name, '').strip
+      method = method_name + '(' + args + ')'
+    end
+    method
+  end
 end
