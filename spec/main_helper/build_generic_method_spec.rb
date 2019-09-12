@@ -1,7 +1,8 @@
-require_relative '../../lib/generators/rspec_steps/main_helper'
+require 'main_helper'
 
 RSpec.describe '.build_generic_method' do
   include RspecSteps::Generators::MainHelper
+
   before do
     @mode = 'method'
   end

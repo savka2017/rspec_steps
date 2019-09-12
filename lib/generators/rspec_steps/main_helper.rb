@@ -21,8 +21,9 @@ module RspecSteps
       end
 
       def step_from_line(line)
-        new_line = strip_prefixes(line)&.strip&.delete_suffix(' do')
-        new_line&.gsub!(/\A'|'\Z/, "") if line.strip.start_with?('step ')
+        new_line = strip_prefixes(decomment line)&.strip&.delete_suffix(' do')
+        new_line&.gsub!(/\A'|'\Z/, '')
+        new_line&.gsub!(/\A"|"\Z/, '')
         new_line
       end
 
