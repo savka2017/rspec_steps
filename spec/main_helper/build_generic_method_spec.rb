@@ -2,6 +2,9 @@ require_relative '../../lib/generators/rspec_steps/main_helper'
 
 RSpec.describe '.build_generic_method' do
   include RspecSteps::Generators::MainHelper
+  before do
+    @mode = 'method'
+  end
 
   it 'remove comment from line' do
     line = 'def my_method # some comment'

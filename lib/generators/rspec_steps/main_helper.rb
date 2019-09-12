@@ -17,12 +17,12 @@ module RspecSteps
 
       # strip prefixes, comments, and empty brackets
       def method_from_line(line)
-        strip_prefixes(decomment(line).strip)&.gsub('()', '')
+        strip_prefixes(decomment(line).strip)&.delete_suffix('()')
       end
 
       def step_from_line(line)
         new_line = strip_prefixes(line)&.strip&.delete_suffix(' do')
-        new_line&.gsub!(/\A'|'\Z/, "") if line.strip.start_with?('step')
+        new_line&.gsub!(/\A'|'\Z/, "") if line.strip.start_with?('step ')
         new_line
       end
 
