@@ -16,13 +16,12 @@ module RspecSteps
       def create_methods
         set_mode
         if collect_methods.empty?
-          puts 'All methods from this spec already defined'
+          puts 'All methods/steps from this file already defined'
         else
           build_defs_container
           puts "Create #{new_defs_count} definition(s)"
         end
-        p new_defs
-        if comment_methods? && mode == 'method'
+        if comment_methods? && mode_method?
           comments_count = comment_spec
           puts "Add #{comments_count} comments to #{file_path}" unless comments_count == 0
         end
@@ -48,7 +47,7 @@ module RspecSteps
 
         unless File.exist?(container_path)
           template "#{mode}_template.rb", container_path
-          gsub_file container_path, 'MethodTemplate', container_name.camelize
+          gsub_file container_path, 'MethodTemplate', container_name.camelize if mode_method?
         end
 
         methods_anchor = 'extend RspecSteps::Aliaseble'

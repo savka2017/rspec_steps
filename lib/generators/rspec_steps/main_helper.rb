@@ -4,7 +4,7 @@ module RspecSteps
   module Generators
     module MainHelper
       include StringHelper
-      # strip all spaces, comments, prefixes, empty brackets, and replace real args with generic arg1,arg2..,argN
+
       def build_generic_method(line)
         method = method_from_line line
         method = build_method to_name_and_args(depoet(method)) if has_args?(method)
@@ -15,7 +15,6 @@ module RspecSteps
         step_from_line(line.strip)
       end
 
-      # strip prefixes, comments, and empty brackets
       def method_from_line(line)
         strip_prefixes(decomment(line).strip)&.delete_suffix('()')
       end
@@ -33,7 +32,6 @@ module RspecSteps
         deprefix(line, prefixes)
       end
 
-      # concat method name with generic args
       def build_method(method)
         method[0] + '(' + ('arg1'.."arg#{args_count dequote(method[1])}").to_a.join(',') + ')'
       end
