@@ -6,7 +6,6 @@ module RspecSteps
     class RspecStepsGenerator < Rails::Generators::NamedBase
       include RspecSteps::Generators::MainHelper
 
-      #namespace "rspec_steps"
       source_root File.expand_path("../templates", __FILE__)
 
       desc "Generates/updates helper file with definitions of method(s)\
