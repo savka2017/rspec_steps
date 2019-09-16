@@ -9,17 +9,19 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rspec_steps'
+gem 'rspec_steps', git: 'https://github.com/savka2017/rspec_steps'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
+Run:
 
-    $ gem install rspec_steps
-
+    $ rails g rspec_steps:install
+    
+    
+to setup some initial values for gem.    
 ## Usage
 
 **Write some spec:**
@@ -94,7 +96,9 @@ In step definition you can use methods with or without prefixes.
 Group them accordingly to logic of step description.  
 Main creteria: readability.
 
-Correct config/initializers/rspec_steps.rb if you want to change default working and destination dirs, allow or forbid comments, change prefixes.
+Correct config/initializers/rspec_steps.rb if you want to 
+change default working and destination dirs, 
+allow or forbid comments, change prefixes.
 
 ### What can you change?
  
