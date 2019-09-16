@@ -20,6 +20,12 @@ Or install it yourself as:
 
     $ gem install rspec_steps
 
+
+Then run:
+
+    $ rails g rspec_steps:install
+    
+    
 ## Usage
 
 **Write some spec:**
@@ -94,7 +100,9 @@ In step definition you can use methods with or without prefixes.
 Group them accordingly to logic of step description.  
 Main creteria: readability.
 
-Correct config/initializers/rspec_steps.rb if you want to change default working and destination dirs, allow or forbid comments, change prefixes.
+Correct config/initializers/rspec_steps.rb if you want to 
+change default working and destination dirs, 
+allow or forbid comments, change prefixes.
 
 ### What can you change?
  
