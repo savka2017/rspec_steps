@@ -1,5 +1,5 @@
 require 'rails/generators/named_base'
-require 'main_helper'
+require_relative 'main_helper'
 
 module RspecSteps
   module Generators
