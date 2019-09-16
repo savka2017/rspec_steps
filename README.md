@@ -9,23 +9,19 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rspec_steps'
+gem 'rspec_steps', path: 'https://github.com/savka2017/rspec_steps'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install rspec_steps
-
-
-Then run:
+Run:
 
     $ rails g rspec_steps:install
     
     
+to setup some initial values for gem.    
 ## Usage
 
 **Write some spec:**
