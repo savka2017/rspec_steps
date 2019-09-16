@@ -30,11 +30,9 @@ and_i_fill_all_requisites
 then_i_should_see_confirmation('Order created succesfully')  
 and_new_record_should_be_added_to_db
 
-**Imp
-
 **Run:**
 
-    $ rails g rspec_steps spec/feature/path_to_this_spec/this_spec.rb
+    $ rails g rspec_steps spec/path_to_this_spec/this_spec.rb
    
 In spec/rspec_steps/path_to_this_spec/this_helper.rb you receive method-definitions for all methods from this_spec.rb.  
 As following:
@@ -68,7 +66,8 @@ Definitions are build only for methods that start with:
 
 You can use each method in spec several times whith different prefixes. 
 
-Finally, you can write some turnip-acceptance test and use defined methods to build turnip-steps:
+Finally, you can write some turnip-acceptance test.
+ Use defined methods to build turnip-steps:
 
 `step 'I am logged as admin' do`  
 `i_am_logged_as_admin`  
@@ -84,9 +83,18 @@ Finally, you can write some turnip-acceptance test and use defined methods to bu
 `and_new_record_should_be_added_to_db`  
 `end`
 
+If you are too lazy to write turnip step-definition by hand,
+run:
+
+    $ rails g rspec_steps spec/path_to_this_feature/some_steps.feature
+
+Gem will build all new step-definition for you.
+
 In step definition you can use methods with or without prefixes.  
 Group them accordingly to logic of step description.  
 Main creteria: readability.
+
+Correct config/initializers/rspec_steps.rb if you want to change default working and destination dirs, allow or forbid comments, change prefixes.
 
 ### What can you change?
  
