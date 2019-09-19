@@ -9,7 +9,7 @@ module RspecSteps
 
       def prepare_files
         copy_initializer
-        configure_rails_helper if File.exist? 'spec/rails_helper.rb'
+        configure_rails_helper
       end
 
       private
