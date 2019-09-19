@@ -3,7 +3,7 @@ require 'rspec_steps_generator'
 
 RSpec.describe RspecSteps::Generators::RspecStepsGenerator, type: :generator do
   destination File.expand_path("../../tmp", __FILE__)
-  arguments %W(spec/features/admin/order_spec.rb)
+  arguments %W(/home/andriy/MyProjects/rspec_steps/spec/lib/generators/tmp/spec/features/admin/order_spec.rb)
 
   before(:all) do
     prepare_destination
