@@ -1,6 +1,5 @@
 require 'bundler/setup'
 require 'rspec_steps'
-require_relative '../spec/support/matcher'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -12,6 +11,4 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
-
-  config.include Spec::BeardMatchers
 end
