@@ -6,11 +6,7 @@ RSpec.describe RspecSteps::Generators::InstallGenerator, type: :generator do
 
   before(:all) do
     prepare_destination
-
-    rails_helper = destination_root + '/spec/rails_helper.rb'
-    content = "\n# Checks for pending migrations and applies them before tests are run."
-    prepare_file rails_helper, content
-
+    prepare_file destination_root + '/spec/rails_helper.rb', :rails_helper
     run_generator
   end
 
