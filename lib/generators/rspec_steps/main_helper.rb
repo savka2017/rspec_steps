@@ -48,7 +48,7 @@ module RspecSteps
 
       def defs_from_dir(dir)
         lines = []
-        searth_dir = File.join(dir, '**', '*.rb')
+        searth_dir = File.join(@root_path + dir, '**', '*.rb')
         Dir[searth_dir].each { |file| lines << defs_from_file(file) }
         lines.flatten(1).uniq(&:first)
       end
@@ -67,6 +67,7 @@ module RspecSteps
       end
 
       def comment_line(commented_file, line, file = nil)
+        file&.delete_prefix! @root_path
         comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
         gsub_file commented_file, line, decomment(line) + comment, {verbose: false }
       end

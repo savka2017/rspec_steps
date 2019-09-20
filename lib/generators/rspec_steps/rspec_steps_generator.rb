@@ -1,4 +1,4 @@
-require 'rails/generators/named_base'
+require 'rails/generators'
 require_relative 'main_helper'
 
 module RspecSteps
@@ -11,7 +11,7 @@ module RspecSteps
       desc "Generates/updates helper file with definitions of method(s)\
             that(s) has been found in spec file"
 
-      attr_accessor :existing_defs, :new_defs, :mode
+      attr_accessor :existing_defs, :new_defs, :mode, :root_path
 
       def create_methods
         set_mode
@@ -31,6 +31,11 @@ module RspecSteps
 
       def set_mode
         @mode = File.extname(file_path) == '.feature' ? 'step' : 'method'
+        if file_path.start_with? 'spec'
+          @root_path = Rails.root
+        else
+          @root_path = file_path.delete_suffix file_path[file_path[0..-7].rindex('spec')..-1]
+        end
       end
 
       def collect_methods
@@ -40,7 +45,7 @@ module RspecSteps
       end
 
       def build_defs_container
-        relative_path = File.dirname(file_path).split('/')[1..-1].join('/')
+        relative_path = File.dirname(file_path.delete_prefix root_path).split('/')[1..-1].join('/')
         container_name = "#{file_name.gsub('_spec.rb', '_helper')}" if mode_method?
         container_name = "#{file_name.gsub('.feature', '')}" if mode_step?
         container_path = File.join(rspec_steps_dir, relative_path, container_name) + '.rb'

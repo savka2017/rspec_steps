@@ -19,18 +19,12 @@ RSpec.describe RspecSteps::Generators::InstallGenerator do
   end
 
   it 'places in initializer configuration code' do
-    result = false
-    File.read(initializer_path).each_line do |line|
-      result = true if line.include? 'RspecSteps.setup do |config|'
-    end
-    expect(result).to be_truthy
+    line = 'RspecSteps.setup do |config|'
+    expect(file_contain_line?(initializer_path, line)).to be_truthy
   end
 
   it 'places in rails_helper configuration code' do
-    result = false
-    File.read(helper_path).each_line do |line|
-      result = true if line.include? "Dir[Rails.root.join('spec/rspec_steps', '**', '*.rb')].each { |f| require f }"
-    end
-    expect(result).to be_truthy
+    line = "Dir[Rails.root.join('spec/rspec_steps', '**', '*.rb')].each { |f| require f }"
+    expect(file_contain_line?(helper_path, line)).to be_truthy
   end
 end
