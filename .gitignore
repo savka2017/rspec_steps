@@ -11,3 +11,5 @@
 .rspec_status
 # IDE files
 .idea
+/log
+/spec/dummy/log
