@@ -1,18 +1,18 @@
 require 'rspec_steps_generator'
 
-RSpec.describe RspecSteps::Generators::RspecStepsGenerator, type: :generator do
+RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
   let(:generator) { RspecSteps::Generators::RspecStepsGenerator }
   let(:dummy_app_root) { File.expand_path('../dummy', __dir__) }
 
-  let(:spec_path) { dummy_app_root + '/spec/features/admin/order_spec.rb' }
-  let(:featere_path) { dummy_app_root + '/spec/acceptance/admin/order.feature' }
-  let(:initializer_path) { dummy_app_root + '/config/initializers/rspec_steps.rb' }
+  let(:spec_path) { File.join(dummy_app_root, 'spec', 'features', 'admin', 'order_spec.rb') }
+  let(:featere_path) { File.join(dummy_app_root, 'spec', 'acceptance', 'admin', 'order.feature') }
+  let(:initializer_path) { File.join(dummy_app_root, 'config', 'initializers', 'rspec_steps.rb') }
 
   let(:run_generator_for_spec) { generator.start([spec_path], destination_root: dummy_app_root) }
   let(:run_generator_for_feature) { generator.start([featere_path], destination_root: dummy_app_root) }
 
-  let(:spec_helper_path) { dummy_app_root + '/spec/rspec_steps/features/admin/order_helper.rb' }
-  let(:feature_helper_path) { dummy_app_root + '/spec/rspec_steps/acceptance/admin/order.rb' }
+  let(:spec_helper_path) { File.join(dummy_app_root, 'spec', 'rspec_steps', 'features', 'admin', 'order_helper.rb') }
+  let(:feature_helper_path) { File.join(dummy_app_root, 'spec', 'rspec_steps', 'acceptance', 'admin', 'order.rb') }
 
   after do
     prepare_file initializer_path, :initializer, true
@@ -26,7 +26,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator, type: :generator do
     end
 
     it 'creates feature dir within rspec_steps dir' do
-      expect(File.exist? dummy_app_root + '/spec/rspec_steps/features').to be_truthy
+      expect(File.exist? File.join(dummy_app_root, 'spec', 'rspec_steps', 'features')).to be_truthy
     end
 
     it 'store relative spec path' do
@@ -51,7 +51,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator, type: :generator do
     end
 
     it 'creates steps dir within rspec_steps dir' do
-      expect(File.exist? dummy_app_root + '/spec/rspec_steps/acceptance').to be_truthy
+      expect(File.exist? File.join(dummy_app_root, 'spec', 'rspec_steps', 'acceptance')).to be_truthy
     end
 
     it 'store relative feature path' do

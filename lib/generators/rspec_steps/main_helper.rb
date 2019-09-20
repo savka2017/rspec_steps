@@ -39,46 +39,6 @@ module RspecSteps
       def args_count(args)
         args.split(',').count
       end
-
-      def defs_from_file(file)
-        lines = []
-        File.read(file).each_line { |line| lines << send("build_generic_#{@mode}", line) }
-        lines.compact.uniq.map { |line| [line, file] }
-      end
-
-      def defs_from_dir(dir)
-        lines = []
-        searth_dir = File.join(@root_path + dir, '**', '*.rb')
-        Dir[searth_dir].each { |file| lines << defs_from_file(file) }
-        lines.flatten(1).uniq(&:first)
-      end
-
-      def comment_file(file, methods)
-        comments_count = 0
-        File.read(file).each_line do |line|
-          generic_method = build_generic_method line
-          if generic_method
-            method = methods.detect { |e| e.first == generic_method }
-            comment_line(file, line, method&.second)
-            comments_count += 1 if method
-          end
-        end
-        comments_count
-      end
-
-      def comment_line(commented_file, line, file = nil)
-        file&.delete_prefix! @root_path
-        comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
-        gsub_file commented_file, line, decomment(line) + comment, {verbose: false }
-      end
-
-      def build_definitions(defs)
-        defs.inject('') { |result, d| result << defs_pattern(d) }
-      end
-
-      def defs_pattern(defs)
-        @mode == 'step' ? "step '#{defs}' do\nend\n\n" : "\n\n  def #{defs}\n  end"
-      end
     end
   end
 end

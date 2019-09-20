@@ -8,8 +8,9 @@ module RspecSteps
 
       source_root File.expand_path("../templates", __FILE__)
 
-      desc "Generates/updates helper file with definitions of method(s)\
-            that(s) has been found in spec file"
+      namespace 'rspec_steps'
+      desc "Generates/updates helper file with definitions of method(s)/step(s)\
+            that(s) has been found in spec/feature file"
 
       attr_accessor :existing_defs, :new_defs, :mode, :root_path
 
@@ -31,15 +32,11 @@ module RspecSteps
 
       def set_mode
         @mode = File.extname(file_path) == '.feature' ? 'step' : 'method'
-        if file_path.start_with? 'spec'
-          @root_path = Rails.root
-        else
-          @root_path = file_path.delete_suffix file_path[file_path[0..-7].rindex('spec')..-1]
-        end
+        @root_path = Rails.root.to_s + '/'
       end
 
       def collect_methods
-        @existing_defs = definition_dirs.inject([]) { |m, dir| m << defs_from_dir(dir) }.flatten(1).compact
+        @existing_defs = definition_dirs.inject([]) { |m, dir| m << defs_from_dir(Rails.root.join(dir)) }.flatten(1).compact
         current_defs = defs_from_file file_path
         @new_defs = current_defs.map(&:first) - existing_defs.map(&:first)
       end
@@ -56,13 +53,53 @@ module RspecSteps
         end
 
         methods_anchor = 'extend RspecSteps::Aliaseble'
-        defs = send("build_definitions", new_defs)
+        defs = build_definitions new_defs
         insert_into_file(container_path,defs, after: methods_anchor) if mode_method?
         append_to_file(container_path, defs) if mode_step?
       end
 
       def comment_spec
         comment_file(file_path, existing_defs)
+      end
+
+      def comment_file(file, methods)
+        comments_count = 0
+        File.read(file).each_line do |line|
+          generic_method = build_generic_method line
+          if generic_method
+            method = methods.detect { |e| e.first == generic_method }
+            comment_line(file, line, method&.second)
+            comments_count += 1 if method
+          end
+        end
+        comments_count
+      end
+
+      def comment_line(commented_file, line, file = nil)
+        file&.delete_prefix! root_path
+        comment = file ? " # #{file.split('/')[1..-1].join('/')}\n" : "\n"
+        gsub_file commented_file, line, decomment(line) + comment, {verbose: false }
+      end
+
+      def defs_from_file(file)
+        lines = []
+        File.read(file).each_line { |line| lines << send("build_generic_#{@mode}", line) }
+        lines.compact.uniq.map { |line| [line, file] }
+      end
+
+      def defs_from_dir(dir)
+        lines = []
+        searth_dir = File.join(dir, '**', '*.rb')
+        Dir[searth_dir].each { |file| lines << defs_from_file(file) }
+        lines.flatten(1).uniq(&:first)
+      end
+
+      def build_definitions(defs)
+        defs.inject('') { |result, d| result << defs_pattern(d) }
+      end
+
+      def defs_pattern(defs)
+        mode_step? ? "step '#{defs}' do\nend\n\n" : "\n\n  def #{defs}\n  end"
       end
 
       def new_defs_count

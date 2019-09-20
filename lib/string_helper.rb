@@ -22,6 +22,7 @@ module StringHelper
   end
 
   def to_name_and_args(method)
+    method += ')' unless method[-1] == ')'
     args = method.scan(/\((.*)\)/).flatten[0]
     name = method.gsub('(' + args + ')', '')
     return [name, args]
