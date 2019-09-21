@@ -25,10 +25,14 @@ module StringHelper
     method += ')' unless method[-1] == ')'
     args = method.scan(/\((.*)\)/).flatten[0]
     name = method.gsub('(' + args + ')', '')
-    return [name, args]
+    [name, args]
   end
 
   def dequote(args)
     args.gsub(/['"]([^['"]]*)['"]/, 'arg')
+  end
+
+  def args_count(args)
+    args.split(',').count
   end
 end

@@ -16,28 +16,24 @@ module RspecSteps
       end
 
       def method_from_line(line)
-        strip_prefixes(decomment(line).strip)&.delete_suffix('()')
+        strip_prefixes(decomment(line).strip, 'method')&.delete_suffix('()')
       end
 
       def step_from_line(line)
-        new_line = strip_prefixes(decomment line)&.strip&.delete_suffix(' do')
+        new_line = strip_prefixes(decomment(line), 'step')&.strip&.delete_suffix(' do')
         new_line&.gsub!(/\A'|'\Z/, '')
         new_line&.gsub!(/\A"|"\Z/, '')
         new_line
       end
 
-      def strip_prefixes(line)
-        pref = @mode == 'method' ? 'def ' : 'step '
-        prefixes = [pref] + RspecSteps.send("#{@mode}_prefixes")
+      def strip_prefixes(line, mode)
+        pref = mode == 'method' ? 'def ' : 'step '
+        prefixes = [pref] + RspecSteps.send("#{mode}_prefixes")
         deprefix(line, prefixes)
       end
 
       def build_method(method)
         method[0] + '(' + ('arg1'.."arg#{args_count dequote(method[1])}").to_a.join(',') + ')'
-      end
-
-      def args_count(args)
-        args.split(',').count
       end
     end
   end

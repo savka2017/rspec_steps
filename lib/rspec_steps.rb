@@ -37,8 +37,4 @@ module RspecSteps
   def self.setup
     yield self
   end
-
-  def switch_comments_to(mode)
-    self.comment_specs_with_method_location = mode
-  end
 end

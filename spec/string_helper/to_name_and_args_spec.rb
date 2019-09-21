@@ -3,7 +3,7 @@ require 'string_helper'
 RSpec.describe '.to_name_and_args' do
   include StringHelper
 
-  it 'devide method into method-name and method-args' do
+  it 'divide method into method-name and method-args' do
     method = 'some_method(some_args)'
     method = to_name_and_args(method)
     expect(method[0]).to eq 'some_method'
