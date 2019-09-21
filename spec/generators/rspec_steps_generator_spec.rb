@@ -64,6 +64,13 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
       line = "step 'I am logged in as Admin' do"
       expect(file_contain_line?(feature_helper_path, line)).to be_falsey
     end
+
+    it 'add to step already defined method' do
+      line = "step 'I visit order page' do"
+      method = 'i_visit_order_page'
+      expect(file_contain_line?(feature_helper_path, line)).to be_truthy
+      expect(file_contain_line?(feature_helper_path, method)).to be_truthy
+    end
   end
 
   describe 'spec - comments' do

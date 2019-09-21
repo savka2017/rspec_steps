@@ -12,7 +12,7 @@ module RspecSteps
       desc "Generates/updates helper file with definitions of method(s)/step(s)\
             that(s) has been found in spec/feature file"
 
-      attr_accessor :existing_defs, :new_defs, :mode, :root_path
+      attr_accessor :existing_defs, :new_defs, :mode, :root_path, :method_defs
 
       def create_methods
         set_mode
@@ -36,9 +36,20 @@ module RspecSteps
       end
 
       def collect_methods
-        @existing_defs = definition_dirs.inject([]) { |m, dir| m << defs_from_dir(Rails.root.join(dir)) }.flatten(1).compact
+        @existing_defs = existing_definitions
         current_defs = defs_from_file file_path
+        method_definitions if mode_step?
         @new_defs = current_defs.map(&:first) - existing_defs.map(&:first)
+      end
+
+      def existing_definitions
+        definition_dirs.inject([]) { |m, dir| m << defs_from_dir(Rails.root.join(dir)) }.flatten(1).compact
+      end
+
+      def method_definitions
+        @mode = 'method'
+        @method_defs = existing_definitions.map(&:first)
+        @mode = 'step'
       end
 
       def build_defs_container
@@ -99,7 +110,12 @@ module RspecSteps
       end
 
       def defs_pattern(defs)
-        mode_step? ? "step '#{defs}' do\nend\n\n" : "\n\n  def #{defs}\n  end"
+        mode_step? ? "step '#{defs}' do\n#{one_step(defs)}\nend\n\n" : "\n\n  def #{defs}\n  end"
+      end
+
+      def one_step(step)
+        method = step.downcase.gsub(' ', '_')
+        method_defs.include?(method) ? "  #{method}" : ''
       end
 
       def new_defs_count
