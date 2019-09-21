@@ -1,12 +1,13 @@
 require 'rspec_steps_generator'
+require 'rspec_steps'
 
 RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
+  include RspecSteps
   let(:generator) { RspecSteps::Generators::RspecStepsGenerator }
   let(:dummy_app_root) { File.expand_path('../dummy', __dir__) }
 
   let(:spec_path) { File.join(dummy_app_root, 'spec', 'features', 'admin', 'order_spec.rb') }
   let(:featere_path) { File.join(dummy_app_root, 'spec', 'acceptance', 'admin', 'order.feature') }
-  let(:initializer_path) { File.join(dummy_app_root, 'config', 'initializers', 'rspec_steps.rb') }
 
   let(:run_generator_for_spec) { generator.start([spec_path], destination_root: dummy_app_root) }
   let(:run_generator_for_feature) { generator.start([featere_path], destination_root: dummy_app_root) }
@@ -15,13 +16,12 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
   let(:feature_helper_path) { File.join(dummy_app_root, 'spec', 'rspec_steps', 'acceptance', 'admin', 'order.rb') }
 
   after do
-    prepare_file initializer_path, :initializer, true
     FileUtils.rm_rf dummy_app_root + '/spec/rspec_steps'
   end
 
   describe 'mode - methdod' do
     before do
-      prepare_file initializer_path, :initializer, false
+      switch_comments_to false
       run_generator_for_spec
     end
 
@@ -46,7 +46,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
 
   describe 'mode - step' do
     before do
-      prepare_file initializer_path, :initializer, false
+      switch_comments_to false
       run_generator_for_feature
     end
 
@@ -71,6 +71,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
 
   describe 'spec - comments' do
     before do
+      switch_comments_to true
       run_generator_for_spec
     end
 

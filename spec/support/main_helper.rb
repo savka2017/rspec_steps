@@ -1,10 +1,6 @@
 module MainHelper
-  def prepare_file(file_path, content_type, mode = nil)
-    unless mode.nil?
-      content = initializer.gsub((!mode).to_s, mode.to_s)
-    else
-      content = send content_type
-    end
+  def prepare_file(file_path, content_type)
+    content = send content_type
     file_dir = File.dirname file_path
     FileUtils.mkdir_p file_dir
     File.open(file_path, 'w+') { |file| file.write content }
@@ -16,19 +12,6 @@ module MainHelper
       result = true if file_line.include? line
     end
     result
-  end
-
-  def initializer
-    <<FILE
-RspecSteps.setup do |config|
-  config.method_prefixes = %w[given_ when_ then_ and_]
-  config.step_prefixes = %w[Given When Then And]
-  config.rspec_steps_dir = 'spec/rspec_steps'
-  config.method_dirs = %w(spec/rspec_steps spec/support)
-  config.step_dirs = %w(spec/rspec_steps spec/steps)
-  config.comment_specs_with_method_location = true
-end
-FILE
   end
 
   def rails_helper
