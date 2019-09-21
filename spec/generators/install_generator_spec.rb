@@ -8,10 +8,12 @@ RSpec.describe RspecSteps::Generators::InstallGenerator do
 
   before do
     FileUtils.rm_rf initializer_path
-    FileUtils.rm_rf helper_path
-
     prepare_file helper_path, :rails_helper
     generator.start([], destination_root: dummy_app_root)
+  end
+
+  after do
+    FileUtils.rm_rf helper_path
   end
 
   it 'creates initializer' do

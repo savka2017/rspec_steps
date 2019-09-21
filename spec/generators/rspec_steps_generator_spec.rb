@@ -17,10 +17,12 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
 
   after do
     FileUtils.rm_rf dummy_app_root + '/spec/rspec_steps'
+    FileUtils.rm_rf dummy_app_root + '/spec/features'
   end
 
   describe 'mode - methdod' do
     before do
+      prepare_file spec_path, :spec
       switch_comments_to false
       run_generator_for_spec
     end
@@ -54,7 +56,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
       expect(File.exist? File.join(dummy_app_root, 'spec', 'rspec_steps', 'acceptance')).to be_truthy
     end
 
-    it 'store relative feature path' do
+    it 'store relative .feature path' do
       expect(File.exist? feature_helper_path).to be_truthy
     end
 
@@ -63,7 +65,7 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
       expect(file_contain_line?(feature_helper_path, line)).to be_truthy
     end
 
-    it 'do not creates already defined methods' do
+    it 'do not creates already defined steps' do
       line = "step 'I am logged in as Admin' do"
       expect(file_contain_line?(feature_helper_path, line)).to be_falsey
     end
@@ -71,12 +73,9 @@ RSpec.describe RspecSteps::Generators::RspecStepsGenerator do
 
   describe 'spec - comments' do
     before do
+      prepare_file spec_path, :spec
       switch_comments_to true
       run_generator_for_spec
-    end
-
-    after do
-      prepare_file spec_path, :spec
     end
 
     it 'add comments to already defined methods' do

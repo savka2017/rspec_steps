@@ -1,9 +1,8 @@
 module MainHelper
   def prepare_file(file_path, content_type)
-    content = send content_type
-    file_dir = File.dirname file_path
-    FileUtils.mkdir_p file_dir
-    File.open(file_path, 'w+') { |file| file.write content }
+    template_path = send content_type
+    FileUtils.mkdir_p File.dirname file_path
+    FileUtils.cp template_path, file_path
   end
 
   def file_contain_line?(file, line)
@@ -15,21 +14,10 @@ module MainHelper
   end
 
   def rails_helper
-    <<FILE
-    
-# Checks for pending migrations and applies them before tests are run.
-
-FILE
+    Rails.root.join('spec', 'fixtures', 'rails_helper.rb')
   end
 
   def spec
-    <<FILE
-RSpec.describe 'Sample' do
-  it 'allow admin to create new order' do
-    given_i_am_logged_as_admin
-    when_i_visit_orders_page
-  end
-end
-FILE
+    Rails.root.join('spec', 'fixtures', 'order_spec.rb')
   end
 end
